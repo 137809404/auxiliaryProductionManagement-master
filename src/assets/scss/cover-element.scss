@@ -1,0 +1,96 @@
+// button
+.el-blue-button {
+  border-radius: 0;
+  background: url(../img/buttonBg.png) center center no-repeat!important;
+  color: white;
+  border: none;
+  background-size: 100% 100%!important;
+  .el-blue-button:hover {
+    color: rgb(0, 202, 253)!important;
+  }
+}
+
+// table
+.el-table__header {
+  background-color: rgb(35, 39, 61);
+  .has-gutter {
+    tr {
+      th {
+        div {
+          color: rgb(122, 124, 138);
+        }
+      }
+    }
+  }
+}
+.el-table {
+  color: white;
+  background-color: rgb(35, 39, 61);
+  border: none;
+  max-height: 64vh;
+  .el-table-column--selection {
+    .cell {
+      padding-left: 14px;
+    }
+  }
+  .textButton {
+    padding-top: 0;
+    padding-bottom: 0;
+    font-size: 24px;
+  }
+  th,
+  td {
+    padding: 10px 0;
+    border:none;
+  }
+
+  tr,
+  th{
+    background-color: rgb(35, 39, 61);
+    border:none;
+  }
+  td {
+    background-color: rgb(35, 39, 61);
+    //border:0.7px solid white;
+    border:none;
+    color: white;
+  }
+}
+.el-table--enable-row-hover .el-table__body tr:hover>td {
+  background-color: rgba($color: #060920, $alpha: 0.4);
+  border: none;
+}
+.el-table td, .el-table th.is-leaf {
+  border: none;
+}
+
+// tabs
+.el-tabs {
+  background-color: rgb(35, 39, 61);
+  border: none;
+}
+.el-tabs__nav-scroll {
+  background-color: rgb(35, 39, 61);
+}
+.el-tabs__item {
+  background-color: rgb(30, 52, 90);
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active {
+  color: white;
+  background-color: rgb(0, 128, 255);
+  border-right-color:  rgb(0, 128, 255);
+  border-left-color:  rgb(0, 128, 255);
+}
+
+.el-input__inner {
+  background-color: rgb(35, 39, 61);
+}
+
+.el-upload-list--picture .el-upload-list__item {
+  background-color: rgb(35, 39, 61);
+}
+
+.el-card__body {
+  background-color: rgb(35, 39, 61);
+  color: white;
+}
