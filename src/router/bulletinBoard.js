@@ -131,6 +131,12 @@ const routerMap =
         name: '移动文件柜',
         component: () => import('@/views/bulletinBoard/src/movingDocument'),
         meta: { active: false }
+      },
+      {
+        path: 'staffDemeanor/editDemeanor',
+        name: '编辑风采',
+        component: () => import('@/views/bulletinBoard/src/staffDemeanor/editDemeanor'),
+        meta: { active: false }
       }
     ]
   }

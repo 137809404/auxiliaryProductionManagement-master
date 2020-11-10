@@ -258,20 +258,22 @@ export default {
     },
     edit (item) {
       this.fileList = []
-      this.formLabelAlign = {
-        id: item.id,
-        title: item.title,
-        timestamp: item.timestamp,
-        content: item.content
-      }
       for (var i = 0, len = item.imgs.length; i < len; i++) {
         this.fileList.push({
           name: item.imgs[i].name,
           url: this.baseUrl + '/' + item.imgs[i].imgurl
         })
       }
+      this.formLabelAlign = {
+        id: item.id,
+        title: item.title,
+        timestamp: item.timestamp,
+        content: item.content,
+        files: this.fileList
+      }
       this.interfaceNow = 'edit'
       this.editID = item.id
+      this.goViewWithQuery('编辑风采', this.formLabelAlign)
     },
     submitChange (form) {
       request({
@@ -390,6 +392,16 @@ export default {
     },
     padLeftZero (str) {
       return ('00' + str).substr(str.length)
+    },
+    goview (name) {
+      this.$router.push({ name }).catch(err => {
+        err && console.log('刷新') // 待优化
+      })
+    },
+    goViewWithQuery (name, data) {
+      this.$router.push({ name, query: { data: data } }).catch(err => {
+        err && console.log('刷新') // 待优化
+      })
     }
   }
 }
