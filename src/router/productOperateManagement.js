@@ -2,11 +2,17 @@ import Layout from '@/views/layout'
 import main from '@/views/layout/components/pageMain'
 const routerMap = {
   path: '/productOperateManagement',
-  redirect: '/productOperateManagement/targetTrendChart',
+  redirect: '/productOperateManagement/home',
   name: '生产运行管理',
   component: Layout,
   meta: { active: false, isFold: true },
   children: [
+    {
+      path: 'home',
+      name: '生产运行管理首页',
+      component: () => import('@/views/productOperateManagement/src/home'),
+      meta: { active: false }
+    },
     {
       path: 'targetTrendChart',
       name: '指标趋势图',
@@ -23,37 +29,37 @@ const routerMap = {
       path: 'productionDailyReport',
       name: '生产日报',
       component: main,
-      redirect: 'productOperateManagement/productionDailyReport/windFarmGeneral',
+      redirect: 'productOperateManagement/productionDailyReport/dailyWindFarmGeneral',
       meta: { active: false, isFold: true },
       children: [
         {
-          path: 'windFarmGeneral',
+          path: 'dailyWindFarmGeneral',
           name: '风电场日综合报表',
-          component: () => import('@/views/productOperateManagement/src/productionDailyReport/windFarmGeneral'),
+          component: () => import('@/views/productOperateManagement/src/productionDailyReport/dailyWindFarmGeneral'),
           meta: { active: false }
         },
         {
-          path: 'companyProduction',
+          path: 'dailyCompanyProduction',
           name: '湛江风电公司生产日报表',
-          component: () => import('@/views/productOperateManagement/src/productionDailyReport/companyProduction'),
+          component: () => import('@/views/productOperateManagement/src/productionDailyReport/dailyCompanyProduction'),
           meta: { active: false }
         },
         {
-          path: 'companyProduction',
+          path: 'dailyCompanyTime0Power',
           name: '湛江风电公司0点电量报表',
-          component: () => import('@/views/productOperateManagement/src/productionDailyReport/companyTime0Power'),
+          component: () => import('@/views/productOperateManagement/src/productionDailyReport/dailyCompanyTime0Power'),
           meta: { active: false }
         },
         {
-          path: 'windFarmProductionStatistics',
+          path: 'dailyWindFarmProductionStatistics',
           name: '风电场主要生产数据统计汇总报表',
-          component: () => import('@/views/productOperateManagement/src/productionDailyReport/windFarmProductionStatistics'),
+          component: () => import('@/views/productOperateManagement/src/productionDailyReport/dailyWindFarmProductionStatistics'),
           meta: { active: false }
         },
         {
-          path: 'quickProduction',
+          path: 'dailyReport',
           name: '风电日填报',
-          component: () => import('@/views/productOperateManagement/src/productionDailyReport/quickProduction'),
+          component: () => import('@/views/productOperateManagement/src/productionDailyReport/dailyReport'),
           meta: { active: false }
         }]
     },
@@ -65,45 +71,45 @@ const routerMap = {
       meta: { active: false },
       children: [
         {
-          path: 'windFarmGeneral',
+          path: 'monthWindFarmGeneral',
           name: '风电场综合月报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmGeneral'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmGeneral'),
           meta: { active: false }
         },
         {
-          path: 'windFarmDevicesProduction',
+          path: 'monthWindFarmDevicesProduction',
           name: '风电场风机发电量月报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmDevicesProduction'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmDevicesProduction'),
           meta: { active: false }
         },
         {
-          path: 'windFarmProductionTarget',
+          path: 'monthWindFarmProductionTarget',
           name: '风电场月生产指标情况报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmProductionTarget'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmProductionTarget'),
           meta: { active: false }
         },
         {
-          path: 'windFarmQuick',
+          path: 'monthWindFarmProduction',
           name: '风电场电量月报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmProduction'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmProduction'),
           meta: { active: false }
         },
         {
-          path: 'windFarmQuick',
+          path: 'monthWindFarmQuick',
           name: '风电场月快报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmQuick'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmQuick'),
           meta: { active: false }
         },
         {
-          path: 'ProductionReportingPlatform',
+          path: 'monthProductionReportingPlatform',
           name: '广东发电信息上报平台报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/ProductionReportingPlatform'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthProductionReportingPlatform'),
           meta: { active: false }
         },
         {
-          path: 'MainTarget',
+          path: 'monthWindFarmProductionStatistics',
           name: '风电场主要生产数据统计汇总月报表',
-          component: () => import('@/views/productOperateManagement/src/productionMonthReport/windFarmProductionStatistics'),
+          component: () => import('@/views/productOperateManagement/src/productionMonthReport/monthWindFarmProductionStatistics'),
           meta: { active: false }
         }]
     },
@@ -115,14 +121,14 @@ const routerMap = {
       meta: { active: false },
       children: [
         {
-          path: 'windFarmGeneralReport',
+          path: 'weekWindFarmGeneralReport',
           name: '生产周报表',
-          component: () => import('@/views/productOperateManagement/src/productionWeekReport/windFarmGeneralReport'),
+          component: () => import('@/views/productOperateManagement/src/productionWeekReport/weekWindFarmGeneralReport'),
           meta: { active: false }
         }, {
-          path: 'windFarmGeneralReport',
+          path: 'weekWindFarmProductionStatistics',
           name: '风电场主要数据统计汇总周报表',
-          component: () => import('@/views/productOperateManagement/src/productionWeekReport/windFarmProductionStatistics'),
+          component: () => import('@/views/productOperateManagement/src/productionWeekReport/weekWindFarmProductionStatistics'),
           meta: { active: false }
         }]
     },

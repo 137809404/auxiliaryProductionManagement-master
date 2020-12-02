@@ -1,9 +1,17 @@
 <template>
   <div>
   <div>
-    <div>
-      <el-button class="el-blue-button" @click="goback()">返回上级</el-button>
-    </div>
+    <el-row type="flex" :gutter="0" style="padding-left: 20px;justify-content: space-between">
+      <el-col :span="4">
+        <h2 class="subtitle" style="margin-top: 15px; margin-left: 5px">
+          <el-button type="text" @click="goback"><i class="el-icon-back subtitle"></i></el-button>修改内容
+        </h2>
+      </el-col>
+      <el-col span="20">
+        <el-button  style="float: right;margin-right: 50px;margin-top: 20px" class="el-blue-button" @click="submitChange(formLabelAlign)">提交</el-button>
+      </el-col>
+    </el-row>
+    <hr style="border-bottom: none;border-color: #8c939d"/>
     <div class="content-div">
       <el-form :label-position="'right'" label-width="80px" :model="formLabelAlign">
         <el-form-item label-width="0px">
@@ -28,14 +36,11 @@
             :on-preview="handlePreview"
             :on-remove="handleRemove"
             :on-change="handleChange"
-            :file-list="this.formLabelAlign.files"
+            :file-list="fileList"
             :auto-upload="false"
             list-type="picture-card">
             <i class="el-icon-plus"></i>
           </el-upload>
-        </el-form-item>
-        <el-form-item>
-          <el-button class="el-blue-button" type="primary" @click="submitChange(formLabelAlign)">提交</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -47,31 +52,35 @@
 </template>
 
 <script>
+import { baseURL } from '@/config/baseConfig'
 import request from '@/network/request'
 
 export default {
   name: 'editDemeanor',
-  create () {
-    this.formLabelAlign = this.$route.query.data
-    console.log(this.formLabelAlign)
-  },
   data () {
     return {
+      baseUrl: baseURL,
       dialogImageUrl: '',
       dialogVisible: false,
-      formLabelAlign: {},
-      deleteFiles: []
+      formLabelAlign: {
+        id: -1,
+        title: '',
+        timestamp: '',
+        content: '',
+        imgs: []
+      },
+      deleteFiles: [],
+      fileList: []
     }
   },
   methods: {
     handleRemove (file) {
       console.log(file)
       this.deleteFiles.push(file.name)
-      this.formLabelAlign.files.splice(this.formLabelAlign.files.indexOf(file), 1)
+      this.fileList.splice(this.fileList.indexOf(file), 1)
     },
     handleChange (file) {
-      this.formLabelAlign.files.push(file)
-      console.log(this.formLabelAlign.files)
+      this.fileList.push(file)
     },
     handlePreview (file) {
       this.dialogImageUrl = file.url
@@ -100,8 +109,8 @@ export default {
         })
         const fd = new FormData()
         fd.append('id', form.id)
-        for (var j = 0, len1 = this.formLabelAlign.files.length; j < len1; j++) {
-          fd.append('files', this.formLabelAlign.files[j].raw)
+        for (var j = 0, len1 = this.fileList.length; j < len1; j++) {
+          fd.append('files', this.fileList[j].raw)
         }
         request({
           method: 'post',
@@ -117,6 +126,7 @@ export default {
       }, error => {
         this.$message.error('修改失败')
       })
+      this.goview('员工风采')
     },
     formatDate (date, fmt) {
       if (/(y+)/.test(fmt)) {
@@ -139,11 +149,52 @@ export default {
     },
     padLeftZero (str) {
       return ('00' + str).substr(str.length)
+    },
+    goview (name) {
+      this.$router.push({ name }).catch(err => {
+        err && console.log('刷新') // 待优化
+      })
+    }
+  },
+  created () {
+    this.formLabelAlign = this.$route.query.data
+    this.fileList = []
+    for (var i = 0, len = this.formLabelAlign.imgs.length; i < len; i++) {
+      this.fileList.push({
+        name: this.formLabelAlign.imgs[i].name,
+        url: this.baseUrl + '/' + this.formLabelAlign.imgs[i].imgurl
+      })
     }
   }
 }
 </script>
 
 <style scoped>
-
+.content-div {
+  margin: 20px auto;
+  width: 80%;
+}
+.el-form-item /deep/ textarea {
+  background-color: transparent;
+}
+.el-form /deep/ label {
+  color: white;
+}
+.el-form /deep/ .el-input__inner {
+  color: white;
+}
+.el-form /deep/ .el-textarea__inner {
+  color: white;
+  width: 95%;
+  min-height: 240px !important;
+}
+.el-form /deep/ div {
+  color: white;
+}
+.el-form /deep/ .el-upload-list__item-name {
+  color: white;
+}
+.el-form /deep/ .el-upload--picture-card {
+  background-color: transparent;
+}
 </style>

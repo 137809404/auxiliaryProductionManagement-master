@@ -4,16 +4,17 @@
       <page-aside/>
     </div>
     <div class="sub-container">
-      <div class="header">
-        <page-header/>
-      </div>
-      <div class="main-container">
+      <div class="sub-sub-container">
+        <div class="layout-header">
+          <page-header/>
+        </div>
         <div class="main">
           <page-main/>
         </div>
       </div>
     </div>
   </div>
+<!--  <div class="test"></div>-->
 </template>
 
 <script>
@@ -28,6 +29,8 @@ export default {
   },
   created () {
   },
+  methods: {
+  },
   computed: {
     flag () {
       return true
@@ -37,30 +40,34 @@ export default {
 </script>
 
 <style lang="scss">
+  .test {
+    width: 100vw;
+    height: 100vh;
+    background-color: #409EFF;
+  }
   .container {
+    width: 100vw;
+    height: 100vh;
     display: flex;
+    padding: 0;
+    color: #e5e9f2;
   }
   .aside {
-    width: 6%;
+    width: 5%;
     background-color: RGB(25, 26, 44);
   }
   .sub-container {
-    width: 94%;
-    height: 100vh;
+    width: 95%;
+    height: 100%;
     background-color: RGB(25, 26, 44);
   }
-  .header {
-    width: 100%;
-    height: 10%;
-    margin-right: 0;
-  }
-  .main-container {
-    width: 100%;
-    height: 90%;
-  }
-  .main {
+  .sub-sub-container {
     width: 99%;
-    height: 100%;
+    height: 99%;
     background-color: RGB(35,39,61);
+  }
+  .layout-header {
+    height: 8vh;
+    background-color: RGB(25, 26, 44);
   }
 </style>

@@ -1,17 +1,26 @@
 <template>
   <div>
-    <el-row type="flex" :gutter="20" style="padding-left: 20px">
-      <el-button type="text" @click="goback"><i class="el-icon-back" style="color: white;font-size: xx-large"></i></el-button>
-      <h2 style="margin-top: 23px; margin-left: 5px">新增通知内容</h2>
+    <el-row type="flex" :gutter="0" style="padding-left: 20px">
+      <el-col :span="4">
+        <h2 class="subtitle" style="margin-top: 15px; margin-left: 0px">
+          <el-button type="text" @click="goback"><i class="el-icon-back subtitle"></i></el-button>新增通知内容
+        </h2>
+      </el-col>
+      <el-col :span="20">
+        <div style="padding: 20px 33px 0px 0px;float: right">
+          <el-button class="el-green-button" @click="addNotice"><i class="el-icon-search"></i>保存</el-button>
+          <el-button class="el-red-button" @click="goback"><i class="el-icon-plus"></i>&nbsp;取消</el-button>
+        </div>
+      </el-col>
     </el-row>
-    <el-row type="flex" :gutter="20" justify="space-around" style="margin-top: 50px">
-      <el-col  :span="18">
-        <el-form :model="newNotice"  label-width="100px">
+    <hr style="border-bottom: none;border-color: #8c939d"/>
+    <el-row type="flex" :gutter="20" justify="space-around" style="margin-top: 20px;padding-bottom: 20px">
+      <el-col  :span="20">
+        <el-form v-model="newNotice"  label-width="150px">
           <el-form-item
             prop="title"
             label="标题:"
-            :rules="[{ required: true, message: '标题不能为空', trigger: 'blur' }]"
-          >
+            :rules="[{ required: true, message: '标题不能为空', trigger: 'blur' }]">
             <el-input v-model="newNotice.title"></el-input>
           </el-form-item>
           <el-form-item
@@ -30,7 +39,7 @@
             prop="content"
             label="内容："
             :rules="[{required: true, message: '请输入内容', trigger: 'blur'}]">
-            <el-input type="textarea" v-model="newNotice.content" :autosize="{ minRows:10, maxRows:20}"></el-input>
+            <el-input type="textarea" v-model="newNotice.content" :autosize="{ minRows:9, maxRows:20}"></el-input>
           </el-form-item>
           <el-form-item
             prop="content"
@@ -44,55 +53,34 @@
             style="display:inline-block"
             :show-file-list="false"
             :limit="5"
-            class="upload-demo"
             ref="upload"
-            action="http://202.199.6.45:8080/bulletin/uploadnotificationfiles?id=20"
-            :file-list="newNotice.files"
-            :auto-upload="true"
-            :on-remove="handleRemove"
-            :on-success="successUpload"
-            :on-error="errorUpload">
+            action=""
+            :on-change="fileChange"
+            :auto-upload="false">
             <el-button class="el-blue-button" slot="trigger" size="small" style="margin-left: 100px">浏览</el-button>
             <!--              <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">上传到服务器</el-button>-->
           </el-upload>
-          <el-button class="el-blue-button" @click="delFiles"  size="small" style="margin-left: 20px">删除</el-button>
+          <el-button class="el-red-button" @click="delFiles"  size="small" style="margin-left: 20px">删除</el-button>
         </el-form>
       </el-col>
-      <el-col :span="4">
-        <el-button class="el-blue-button" @click="addNotice"><i class="el-icon-search"></i>保存</el-button>
-        <el-button class="el-blue-button" @click="goback"><i class="el-icon-plus"></i>&nbsp;取消</el-button>
-      </el-col>
+      <el-col :span="2"></el-col>
     </el-row>
   </div>
 </template>
 
 <script>
 
+import request from '@/network/request'
+
 export default {
   name: 'addNotice',
   data () {
     return {
       newNotice: {
-        id: 1,
         title: '',
         content: '',
         date: '',
-        files: [
-          {
-            name: '防止人身死亡.pdf',
-            url: 'http://futest.sctsjkj.com/template/消防火警联网部件设施数据表.xlsx',
-            checked: false
-          },
-          {
-            name: '防止人身死亡.doc',
-            url: 'http://futest.sctsjkj.com/template/消防火警联网部件设施数据表.xlsx',
-            checked: false
-          },
-          {
-            name: '防止人身死亡.xls',
-            url: 'http://futest.sctsjkj.com/template/消防火警联网部件设施数据表.xlsx',
-            checked: false
-          }]
+        files: []
       }
     }
   },
@@ -105,60 +93,61 @@ export default {
   },
   methods: {
     addNotice () {
-      this.$axios.get('/bulletin/deletenotificationfiles', {
-        params: {
-          title: this.newNotice.title,
-          date: this.newNotice.date,
-          content: this.newNotice.content
-        }
+      const fd = new FormData()
+      fd.append('title', this.newNotice.title)
+      fd.append('content', this.newNotice.content)
+      fd.append('timestamp', this.newNotice.date)
+      this.newNotice.files.forEach(item => {
+        fd.append('files', item.raw)
+        console.log(item.raw)
       })
-        .then((response) => {
-          console.log(response.data)// 请求的返回体
-          // 若创建通知成功再上传附件
-          this.submitUpload()
-        })
-        .catch((error) => {
-          console.log(error)// 异常
-        })
+      request({
+        method: 'post',
+        url: '/bulletin/addnotification',
+        data: fd
+      }).then(res => {
+        console.log(res)
+        if (res.data.data === '添加成功') {
+          this.$confirm('是否继续添加新通知？', '添加成功', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '继续添加',
+            cancelButtonText: '放弃并返回'
+          })
+            .then(() => {
+              this.$message({
+                type: 'info',
+                message: '继续添加'
+              })
+            })
+            .catch(action => {
+              if (action === 'cancel') {
+                this.$router.back(-1)
+              }
+            })
+        }
+      }).catch((error) => {
+        console.log(error)// 异常
+      })
     },
+    // 判断是否重复上传
+    fileChange (file, fileList) {
+      const existFile = fileList.slice(0, fileList.length - 1).find(f => f.name === file.name)// 如果文件名重复
+      if (existFile) {
+        this.$message.error('当前文件已经存在!')
+        fileList.pop()
+      }
+      this.newNotice.files = fileList
+    },
+    // 批量删除，分别调用
     delFiles () {
-      this.files.forEach((file) => {
-        if (file.checked === true) { this.files.splice(this.files.indexOf(file), 1) }
-      })
-    },
-    submitUpload () {
-      this.$refs.upload.submit()
-    },
-    handleRemove (file, fileList) {
-      // 上传的文件列表中最后一个文件为空对象
-      console.log(file, fileList)
-      this.$axios.get('/bulletin/deletenotificationfiles', {
-        params: {
-          filename: file.filename,
-          id: this.newNotice.id
+      this.newNotice.files.forEach((file) => {
+        if (file.checked === true) {
+          this.newNotice.files.splice(this.newNotice.files.indexOf(file), 1)
+          // this.newNotice.files.splice(this.newNotice.files.indexOf(file), 1)
+          // this.removeFile(file, this.newNotice.files)
         }
       })
-        .then((response) => {
-          console.log(response.data)// 请求的返回体
-          // 直接改变数组中的值，Vue检测不到
-          this.Vue.files.splice(file.index, 1)
-        })
-        .catch((error) => {
-          console.log(error)// 异常
-        })
     },
-    successUpload (response, file, fileList) {
-      console.log(response, file, fileList)
-      this.newNotice.files.push(file)
-    },
-    errorUpload (err, file, fileList) {
-      alert('传失败了')
-      console.log(err, file, fileList)
-    },
-    handlePreview (file) {
-      console.log(file)
-    },
-    uploadSectionFile () {},
     goback: function () {
       console.log('huitui')
       this.$router.back(-1)

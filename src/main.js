@@ -11,9 +11,12 @@ import 'echarts/lib/chart/bar'
 import 'echarts/lib/chart/line'
 import JsonExcel from 'vue-json-excel'
 import axios from 'axios'
-import Subtitle from './components/sub-title'
+import routerUtil from './utils/routerUtil'
+
 Vue.prototype.$axios = axios
 axios.defaults.baseURL = 'http://202.199.6.45:8080'
+// 我们的 'http://202.199.6.45:8080'
+// 越能的 'https://172.19.220.6:8080'
 
 // 全局注册chart组件
 Vue.component('chart', ECharts)
@@ -21,8 +24,9 @@ Vue.component('chart', ECharts)
 Vue.use(ElementUI)
 Vue.config.productionTip = false
 
+routerUtil(router)
+
 Vue.component('downloadExcel', JsonExcel)
-Vue.component('subtitle', Subtitle)
 new Vue({
   router,
   store,

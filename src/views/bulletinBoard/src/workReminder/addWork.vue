@@ -1,189 +1,151 @@
 <template>
   <div>
-    <el-row type="flex" :gutter="20" style="padding-left: 20px; padding-top: 10px; margin-bottom: 9px">
-      <el-col :span="1">
-        <el-button type="text" @click="goback"><i class="el-icon-back" style="color: white;font-size: xx-large"></i></el-button>
+    <el-row type="flex" :gutter="0" style="padding-left: 20px; margin-bottom: 8px">
+      <el-col :span="5">
+        <h2 class="subtitle" style="margin-top: 18px;margin-left: 5px">
+          <el-button type="text" @click="goback"><i class="el-icon-back subtitle"></i></el-button>
+          新增工作提醒
+        </h2>
       </el-col>
-      <el-col :span="3">
-        <h2 style="margin-top: 12px;margin-left: -25px">新增工作提醒</h2>
+      <el-col :span="5">
+        <el-button-group style="margin-top: 20px">
+          <el-button class="el-blue-button" @click="showFixReminders">固定</el-button>
+          <el-button class="el-blue-button" @click="showTempReminders">临时</el-button>
+        </el-button-group>
       </el-col>
-      <el-col :span="18">
-<!--        <el-form :inline="true"  class="demo-form-inline" style="margin-top: 10px">-->
-<!--          <el-form-item>-->
-<!--            <div class="block">-->
-<!--              <span class="demonstration">创建月份：</span>-->
-<!--              <el-date-picker-->
-<!--                v-model="month"-->
-<!--                type="month"-->
-<!--                placeholder="选择月">-->
-<!--              </el-date-picker>-->
-<!--            </div>-->
-<!--          </el-form-item>-->
-<!--          <el-button class="el-blue-button"><i class="el-icon-folder-add"></i> &nbsp;创建</el-button>-->
-<!--        </el-form>-->
+      <el-col :span="15">
+        <el-form v-show="activeName === 'fixReminders'" :inline="true"  class="demo-form-inline" style="margin-top: 15px">
+          <el-form-item>
+            <div class="block">
+              <span class="demonstration">创建月份：</span>
+              <el-date-picker
+                v-model="month"
+                type="month"
+                placeholder="选择月"
+                format="yyyy-MM"
+                value-format="yyyy-MM-dd">
+              </el-date-picker>
+            </div>
+          </el-form-item>
+          <el-button class="el-blue-button" @click="addaNewFixReminder"><i class="el-icon-folder-add"></i> &nbsp;创建</el-button>
+        </el-form>
       </el-col>
-      <el-col :span="1">
-        <div style="padding: 10px 20px 15px 40px">
-          <el-button class="el-blue-button"><i class="el-icon-document"></i>&nbsp;保存</el-button>
-        </div>
-        <!--          <download-excel
-                    class = "export-excel-wrapper"
-                    :data = "json_data"
-                    :fields = "json_fields"
-                    name = "filename.xls"
-                    style = "display: inline; margin:0 10px">
-                    &lt;!&ndash; 上面可以自定义自己的样式，还可以引用其他组件button &ndash;&gt;
-                    <el-button class="el-blue-button"><i class="el-icon-download"></i>&nbsp;导出Excel</el-button>
-                  </download-excel>-->
-      </el-col>
+      <el-col :span="2"></el-col>
     </el-row>
-    <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
-    <el-tab-pane label="固定工作提醒" name="fixReminder">
-      <el-row type="flex" justify="space-between">
-        <el-col :span="6">
-          <el-form :inline="true"  class="demo-form-inline">
-            <el-form-item>
-              <div class="block">
-                <span class="demonstration">创建月份：</span>
-                <el-date-picker
-                  v-model="month"
-                  type="month"
-                  placeholder="选择月"
-                  format="yyyy-MM"
-                  value-format="yyyy-MM-dd">
-                </el-date-picker>
-              </div>
-            </el-form-item>
-            <el-button class="el-blue-button" @click="setMonth"><i class="el-icon-folder-add"></i> &nbsp;创建</el-button>
-          </el-form>
-        </el-col>
-        <el-col :span="3" style="padding-left: 32px">
-          <el-button class="el-blue-button" @click="insert"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
-          <el-button class="el-blue-button"><i class="el-icon-document"></i>&nbsp;保存</el-button>
-        </el-col>
-      </el-row>
-      <el-row style="margin-top: 0px">
-        <el-table
-          v-if="activeName === 'fixReminder'"
-          :data="fixReminders"
-          stripe
-          border
-          :header-cell-style="{background:'#6CA6CD',color:'#FFFFFF'}"
-          style="width: 100%">
-          <!--<el-table-column v-for="prop in tableData[1]" :key="prop" :prop="prop.key" :label="prop.value" width="150" align="center"></el-table-column>-->
-          <el-table-column width="240px" prop="date" label="日期" align="center">
-            <template slot-scope="scope">
+    <hr style="border-bottom: none;border-color: #8c939d"/>
+    <el-row style="margin: 0 20vw 0 5vw">
+      <div v-show="activeName === 'tempReminders'">
+        <el-row style="margin-top: 25px">
+          <el-form :model="newTempReminder"  label-width="130px">
+            <el-form-item
+              prop="date"
+              label="提醒日期："
+              :rules="[{required: true, message: '请选择时间', trigger: 'blur'}]">
               <el-date-picker
-                size="small"
-                v-model="scope.row.date"
-                type="date"
+                v-model="newTempReminder.noticetime"
+                type="datetime"
                 placeholder="选择日期"
-                :picker-options="pickerOptions">
+                format="yyyy-MM-dd hh:mm:ss"
+                value-format="yyyy-MM-dd HH:mm:ss">
               </el-date-picker>
-            </template>
-          </el-table-column>
-          <el-table-column prop="mainTask" label="主要任务" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.mainTask" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="content" label="业务内容" width="250" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.content" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="publishPlatform" label="发布平台" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.publishPlatform" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="target" label="报送对象" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.target" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="sendTime" label="报送时间" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.sendTime" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="editPerson" label="编制人" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.editPerson" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="checkPerson" label="审核人" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.checkPerson" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
-            <template slot-scope="scope">
-              <el-button class="el-blue-button" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-row>
-    </el-tab-pane>
-    <el-tab-pane label="临时工作提醒" name="tempReminder">
-      <el-row type="flex" justify="space-between">
-        <el-col :span="3" :offset="21" style="padding-left: 33px">
-          <el-button class="el-blue-button" @click="insert"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
-          <el-button class="el-blue-button"><i class="el-icon-document"></i>&nbsp;保存</el-button>
-        </el-col>
-      </el-row>
-      <el-row style="margin-top: 25px">
-        <el-table
-          v-if="activeName === 'tempReminder'"
-          :data="tempReminders"
-          stripe
-          :header-cell-style="{background:'#6CA6CD',color:'#FFFFFF'}"
-          style="width: 100%">
-          <!--<el-table-column v-for="prop in tableData[1]" :key="prop" :prop="prop.key" :label="prop.value" width="150" align="center"></el-table-column>-->
-          <el-table-column width="240px" prop="date" label="日期" align="center">
-            <template slot-scope="scope">
-              <el-date-picker
-                size="small"
-                v-model="scope.row.date"
-                type="date"
-                placeholder="选择日期">
-              </el-date-picker>
-            </template>
-          </el-table-column>
-          <el-table-column prop="taskType" label="任务类型" align="center">
-            <template slot-scope="scope">
-              <span>{{scope.row.taskType}}</span>
-            </template>
-          </el-table-column>
-          <el-table-column prop="taskContent" label="任务内容" width="800" align="center">
-            <template slot-scope="scope">
-              <el-input size="small" v-model="scope.row.taskContent" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column prop="remindedTarget" label="提醒对象" width="250" align="center">
-            <template slot-scope="scope">
-              <el-input  size="small" v-model="scope.row.remindedPerson" placeholder="请输入内容" @change="handleEdit(scope.$index, scope.row)"></el-input>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作" width="80" align="center">
-            <template slot-scope="scope">
-              <el-button class="el-blue-button" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-row>
-
-    </el-tab-pane>
-  </el-tabs>
+            </el-form-item>
+            <el-form-item
+              prop="taskType"
+              label="任务类型：">
+              <el-input value="临时工作提醒" readonly></el-input>
+            </el-form-item>
+            <el-form-item
+              prop="taskType"
+              label="提醒对象：">
+              <el-input v-model="newTempReminder.who_to_notice"></el-input>
+            </el-form-item>
+            <el-form-item
+              prop="content"
+              label="任务内容："
+              :rules="[{required: true, message: '请输入内容', trigger: 'blur'}]">
+              <el-input type="textarea" v-model="newTempReminder.business" :autosize="{ minRows:7, maxRows:20}"></el-input>
+            </el-form-item>
+            <el-button @click="addaNewTempReminder" class="el-blue-button" style="float: right"><i class="el-icon-document"></i>&nbsp;保存</el-button>
+          </el-form>
+        </el-row>
+      </div>
+    </el-row>
+    <add-dialog
+      :visibleFlag.sync="dialogData.visibleFlag"
+      @handleSubmit="addaNewFixReminder"
+      width="40%"
+      :title="dialogData.dialogTitle"
+    >
+      <el-form ref="FormDate" :model="newFixReminder"  label-width="100px" slot="dialog-section">
+        <el-form-item
+          prop="date"
+          label="提醒日期："
+          :rules="[{required: true, message: '请选择时间', trigger: 'blur'}]">
+          <el-date-picker
+            v-model="newFixReminder.date"
+            type="datetime"
+            placeholder="选择日期"
+            format="yyyy-MM-dd hh:mm:ss"
+            value-format="yyyy-MM-dd hh:mm:ss">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item
+          prop="mainTask"
+          label="主要任务："
+          :rules="[{required: true, message: '请输入内容', trigger: 'blur'}]">
+          <el-select v-model="newFixReminder.mainTask" placeholder="请选择活动区域">
+            <el-option label="日报" value="日报"></el-option>
+            <el-option label="周报" value="周报"></el-option>
+            <el-option label="月报" value="月报"></el-option>
+            <el-option label="每日日常工作" value="每日日常工作"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item
+          prop="content"
+          label="业务内容：">
+          <el-input v-model="newFixReminder.content"></el-input>
+        </el-form-item>
+        <el-form-item
+          prop="publishPlatform"
+          label="发布平台：">
+          <el-input v-model="newFixReminder.publishPlatform"></el-input>
+        </el-form-item>
+        <el-form-item
+          prop="target"
+          label="报送对象：">
+          <el-input v-model="newFixReminder.target"></el-input>
+        </el-form-item>
+        <el-form-item
+          prop="sendTime"
+          label="报送时间：">
+          <el-input v-model="newFixReminder.sendTime"></el-input>
+        </el-form-item>
+        <el-form-item
+          prop="editPerson"
+          label="编制人：">
+          <el-input v-model="newFixReminder.editPerson"></el-input>
+        </el-form-item>
+        <el-form-item
+          prop="checkPerson"
+          label="审核人：">
+          <el-input v-model="newFixReminder.checkPerson"></el-input>
+        </el-form-item>
+      </el-form>
+    </add-dialog>
   </div>
 </template>
 
 <script>
+import addDialog from '@/views/bulletinBoard/components/addDialog'
+import request from '@/network/request'
 export default {
   name: 'addWork',
+  components: {
+    addDialog
+  },
   data () {
     return {
-      activeName: 'fixReminder',
+      activeName: 'fixReminders',
       month: '',
       startDate: '',
       endDate: '',
@@ -193,29 +155,29 @@ export default {
           return time.getTime() < new Date('2020-10-01') || time.getTime() > new Date('2020-10-30')
         }
       },
-      fixReminders: [
-        {
-          date: '2020-10-18',
-          mainTask: '日报',
-          content: '风电场综合日报',
-          publishPlatform: '当班值长邮箱',
-          target: '集团公司',
-          sendTime: '值长报送',
-          editPerson: 'XXX',
-          checkPerson: 'XXX',
-          completion: ''
-        }, {
-          date: '2020-10-18',
-          mainTask: '日报',
-          content: '风电场综合日报',
-          publishPlatform: '当班值长邮箱',
-          target: '集团公司',
-          sendTime: '值长报送',
-          editPerson: 'XXX',
-          checkPerson: 'XXX',
-          completion: ''
-        }],
-      tempReminders: []
+      fixReminders: [],
+      newTempReminder: {
+        noticetime: '',
+        business: '',
+        who_to_notice: ''
+      },
+      newFixReminder: {
+        date: '2020-10-18',
+        mainTask: '日报',
+        content: '风电场综合日报',
+        publishPlatform: '当班值长邮箱',
+        target: '集团公司',
+        sendTime: '值长报送',
+        editPerson: 'XXX',
+        checkPerson: '@@@XXX',
+        completion: ''
+      },
+      dialogData: {
+        visibleFlag: false,
+        dialogTitle: '新增',
+        formType: 'add',
+        editData: {}
+      }
     }
   },
   methods: {
@@ -232,35 +194,101 @@ export default {
       console.log('日期范围：' + this.startDate + ' - ' + this.endDate)
       // this.setPickable()
     },
-    insert () {
-      if (this.activeName === 'fixReminder') {
-        console.log(this.activeName)
-        this.fixReminders.push({
-          date: '',
-          mainTask: '',
-          taskContent: '',
-          publishPlatform: '',
-          submitPerson: '',
-          submitTime: '',
-          creator: '',
-          checker: ''
-        })
-      } else {
-        this.tempReminders.push({
-          date: '',
-          taskType: '临时工作提醒',
-          taskContent: '',
-          remindedTarget: ''
-        })
-      }
+    /**
+     *新增一个月工作提醒
+     *   方案一，在这个界面编辑
+     * √ 方案二，直接跳转到查看界面编辑
+     */
+    addaNewFixReminder () {
+      this.setMonth()
+      console.log(this.newFixReminder)
+      request({
+        method: 'post',
+        url: '/bulletin/addplan',
+        params: {
+          date: this.month,
+          editor: this.$store.state.user.username
+        }
+      }).then(res => {
+        console.log(res)
+        if (res.data.message === '有重复记录') {
+          this.$message({
+            type: 'info',
+            message: '该月工作计划已存在'
+          })
+        } else {
+          this.goViewWithQuery('查看工作提醒', res.data.data)
+          // this.fixReminders = res.data.data
+          // this.fixReminders.forEach(reminder => {
+          //   reminder.date = this.month.slice(0, 7) + '-' + reminder.date
+          // })
+          // console.log(this.fixReminders)
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$message({
+          type: 'info',
+          message: '登陆已过期，请注销后重新登录'
+        })// 异常
+      })
+    },
+    goViewWithQuery (name, data) {
+      this.$router.push({ name, query: { data: data } }).catch(err => {
+        err && console.log('刷新') // 待优化
+      })
+    },
+    /**
+     * 新增一条临时工作提醒
+     */
+    addaNewTempReminder () {
+      console.log(this.newTempReminder)
+      request({
+        method: 'post',
+        url: '/bulletin/addplantemporary',
+        params: {
+          noticetime: this.newTempReminder.noticetime,
+          who_to_notice: this.newTempReminder.who_to_notice,
+          business: this.newTempReminder.business,
+          CHECK_TYPE: 1,
+          TIMES_NEED_2_CHECK: 1
+        }
+      }).then(res => {
+        if (res.data.message === 'SUCCESS') {
+          this.$confirm('是否继续添加？', '添加成功', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '继续添加',
+            cancelButtonText: '放弃并返回'
+          })
+            .then(() => {
+              this.$message({
+                type: 'info',
+                message: '继续添加'
+              })
+            })
+            .catch(action => {
+              if (action === 'cancel') {
+                this.$router.back(-1)
+              }
+            })
+        }
+      }).catch((error) => {
+        console.log(error)
+        this.$message({
+          type: 'info',
+          message: '登陆已过期，请注销后重新登录'
+        })// 异常
+      })
     },
     handleClick (tab, event) {
       console.log(tab, event)
     },
-    handleCurrentChange (row, event, column) {
-      console.log('点击了' + row)
-      console.log(row, event, column, event.currentTarget)
-      console.log(this.tables[0].tableData.length)
+    openDialog (formType, editData = {}) {
+      this.dialogData = {
+        visibleFlag: true,
+        formType,
+        editData,
+        dialogTitle: formType === 'add' ? '新增' : '编辑'
+      }
     },
     handleEdit (index, row) {
       console.log(index + '点击了' + row)
@@ -275,7 +303,6 @@ export default {
       }
     },
     goback: function () {
-      console.log('huitui')
       this.$router.back(-1)
     },
     setPickable () {
@@ -303,6 +330,12 @@ export default {
       }
       var nowDate = year + '-' + month + '-' + day
       return nowDate
+    },
+    showFixReminders () {
+      this.activeName = 'fixReminders'
+    },
+    showTempReminders () {
+      this.activeName = 'tempReminders'
     }
   }
 }

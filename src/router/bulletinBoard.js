@@ -2,11 +2,17 @@ import Layout from '@/views/layout'
 const routerMap =
   {
     path: '/bulletinBoard',
-    redirect: '/bulletinBoard/workReminder',
+    redirect: '/bulletinBoard/home',
     name: '公告栏',
     component: Layout,
     meta: { active: false, isFold: true },
     children: [
+      {
+        path: 'home',
+        name: '公告栏首页',
+        component: () => import('@/views/bulletinBoard/src/home'),
+        meta: { active: false }
+      },
       {
         path: 'workReminder',
         name: '工作提醒',
@@ -110,9 +116,16 @@ const routerMap =
       },
       {
         path: 'classManagement',
-        name: '班组管理',
+        name: '集控人员组织架构',
         component: () => import('@/views/bulletinBoard/src/classManagement'),
         meta: { active: false }
+      },
+      {
+        path: 'classManagement/editStaff',
+        name: '个人资料修改',
+        component: () => import('@/views/bulletinBoard/src/classManagement/editStaff'),
+        meta: { active: false },
+        hidden: true
       },
       {
         path: 'shiftManagement',
@@ -121,22 +134,38 @@ const routerMap =
         meta: { active: false }
       },
       {
+        path: 'shiftManagement/showDuty',
+        name: '查看值班表',
+        component: () => import('@/views/bulletinBoard/src/shiftManagement/showDuty'),
+        meta: { active: false },
+        hidden: true
+      },
+      {
         path: 'staffDemeanor',
         name: '员工风采',
-        component: () => import('@/views/bulletinBoard/src/staffDemeanor'),
+        component: () => import('@/views/bulletinBoard/src/staffDemeanor/index'),
         meta: { active: false }
       },
       {
-        path: 'movingDocument',
-        name: '移动文件柜',
-        component: () => import('@/views/bulletinBoard/src/movingDocument'),
-        meta: { active: false }
+        path: 'staffDemeanor/viewDemeanor',
+        name: '查看风采',
+        component: () => import('@/views/bulletinBoard/src/staffDemeanor/viewDemeanor'),
+        meta: { active: false },
+        hidden: true
+      },
+      {
+        path: 'staffDemeanor/addDemeanor',
+        name: '新增风采',
+        component: () => import('@/views/bulletinBoard/src/staffDemeanor/addDemeanor'),
+        meta: { active: false },
+        hidden: true
       },
       {
         path: 'staffDemeanor/editDemeanor',
-        name: '编辑风采',
+        name: '修改风采',
         component: () => import('@/views/bulletinBoard/src/staffDemeanor/editDemeanor'),
-        meta: { active: false }
+        meta: { active: false },
+        hidden: true
       }
     ]
   }

@@ -1,104 +1,155 @@
 <template>
   <div>
-    <div class="sub-title">
-      安全专栏
-    </div>
-    <el-row type="flex" justify="space-between" :gutter="20">
-      <el-form :inline="true"  class="demo-form-inline">
-        <el-form-item label="时间范围：">
-          <date-range-selector v-on:dateRangeMonitor="dateRangeMonitor"></date-range-selector>
-        </el-form-item>
-        <el-form-item>
-          <el-input placeholder="搜索标题" prefix-icon="el-icon-search" v-model="searchInfo"> </el-input>
-        </el-form-item>
-        <el-button class="el-blue-button"><i class="el-icon-search"></i> &nbsp;查询</el-button>
-        <el-button class="el-blue-button" @click="goview('新增安全通知')"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
-        <el-button class="el-blue-button"><i class="el-icon-refresh-right"></i>&nbsp;重置</el-button>
-      </el-form>
+    <el-row type="flex" :gutter="0" style="padding-left: 20px">
+      <el-col :span="2">
+        <h2 class="subtitle" style="margin-top: 23px; margin-left: 5px">安全专栏</h2>
+      </el-col>
+      <el-col :span="22">
+        <el-form :inline="true"  class="demo-form-inline" style="margin-left: 5vw; margin-top: 20px">
+          <el-form-item label="时间范围：">
+            <div class="block">
+              <el-date-picker
+                style="width: 18vw"
+                v-model="range"
+                type="daterange"
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd">
+              </el-date-picker>
+            </div>
+          </el-form-item>
+          <el-form-item style="margin-left: 2vw">
+            <el-input style="width: 15vw" placeholder="搜索通知标题、通知内容" prefix-icon="el-icon-search" v-model="searchInfo"> </el-input>
+          </el-form-item>
+          <el-button class="el-blue-button" @click="getSecurityNotices"><i class="el-icon-search"></i> &nbsp;查询</el-button>
+          <el-button class="el-blue-button" @click="reload"><i class="el-icon-refresh-right"></i>&nbsp;重置</el-button>
+          <el-button class="el-blue-button" style="float: right;margin-right: 33px" @click="goview('新增安全通知')"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
+        </el-form>
+      </el-col>
     </el-row>
-    <el-table
-      :data="tableData"
-      stripe
-      border
-      style="width: 100%">
-      <el-table-column prop="serialNumber" label="序号" width="150" align="center"></el-table-column>
-      <el-table-column prop="title" label="标题" width="400" align="center"></el-table-column>
-      <el-table-column prop="content" label="内容" align="center"></el-table-column>
-      <el-table-column prop="uploadTime" label="上传时间" width="250" align="center"></el-table-column>
-      <el-table-column label="操作" width="230" align="center">
-        <template slot-scope="scope">
-          <el-button class="el-blue-button" size="mini" @click="handleCheck(scope.$index, scope.row)">查看</el-button>
-          <el-button class="el-blue-button" size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
-          <el-button class="el-blue-button" size="mini" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <hr style="border-bottom: none;border-color: #8c939d"/>
+    <el-row style="margin: 0 5vw">
+      <el-table
+        :data="securityNotices"
+        style="width: 100%"
+        max-height="768">
+        <el-table-column type="index" label="序号" width="60" align="center"></el-table-column>
+        <el-table-column prop="title" label="标题" width="400" align="center"></el-table-column>
+        <el-table-column prop="content" label="发布内容" align="center" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="date" label="发布时间" width="250" align="center"></el-table-column>
+        <el-table-column label="操作" width="280" align="center">
+          <template slot-scope="scope">
+            <el-button class="el-green-button" @click="goViewWithQuery('查看安全通知', scope.row.id)">查看</el-button>
+            <el-button class="el-blue-button" @click="goViewWithQuery('编辑安全通知', scope.row.id)">修改</el-button>
+            <el-button class="el-red-button" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-pagination
+        style="margin-top: 10px;float: right"
+        :page-size="pagesize"
+        @current-change="handleCurrentChange"
+        layout="total, prev, pager, next, jumper"
+        :current-page.sync="currentPage"
+        :total=total>
+      </el-pagination>
+    </el-row>
   </div>
 </template>
 
 <script>
-import dateRangeSelector from '../../../../components/dateRange-selector'
+// import axios from 'axios'
+import request from '@/network/request'
+
 export default {
   name: 'index',
-  components: { dateRangeSelector },
   data () {
     return {
-      startDate: '',
-      endDate: '',
+      range: ['', ''],
       searchInfo: '',
-      tableData: [{
-        serialNumber: '1',
-        title: 'XXXXXXXXXXXXX',
-        content: 'XXXXXXXXXXXXXXXXXX',
-        uploadTime: 'XXX'
-      }, {
-        serialNumber: '2',
-        title: 'XXXXXXXXXXXXX',
-        content: 'XXXXXXXXXXXXXXXXXX',
-        uploadTime: 'XXX'
-      }, {
-        serialNumber: '3',
-        title: 'XXXXXXXXXXXXX',
-        content: 'XXXXXXXXXXXXXXXXXX',
-        uploadTime: 'XXX'
-      }, {
-        serialNumber: '4',
-        title: 'XXXXXXXXXXXXX',
-        content: 'XXXXXXXXXXXXXXXXXX',
-        uploadTime: 'XXX'
-      }]
+      securityNotices: [],
+      total: 0,
+      currentPage: 1,
+      pagesize: 5
     }
   },
+  created () {
+    this.getSecurityNotices('1970-01-01', '2100-12-31')
+  },
+  inject: ['reload'],
   methods: {
-    dateRangeMonitor: function (startDate, endDate) {
-      this.startDate = startDate
-      this.endDate = endDate
-    },
-    handleCheck (index, row) {
-      console.log(index, row)
-      this.goViewWithQuery('查看安全通知', row.title)
-    },
-    handleEdit (index, row) {
-      console.log(index, row)
-      this.goViewWithQuery('编辑安全通知', row.title)
-    },
-    handleDelete (index, row) {
-      console.log(index, row)
-    },
     goview (name) {
       this.$router.push({ name }).catch(err => {
         err && console.log('刷新') // 待优化
       })
     },
     goViewWithQuery (name, data) {
+      console.log('请求' + data + '通知')
       this.$router.push({ name, query: { data: data } }).catch(err => {
         err && console.log('刷新') // 待优化
       })
+    },
+    getSecurityNotices: function (startTime, endTime) {
+      if (isNaN(startTime)) {
+        startTime = '1970-01-01'
+        endTime = '2100-12-31'
+      }
+      console.log('开始日期' + startTime + '截止日期' + endTime)
+      request({
+        method: 'get',
+        url: '/bulletin/showsafetycolumns',
+        params: {
+          endtime: endTime,
+          starttime: startTime,
+          keyword: this.searchInfo,
+          pagesize: this.pagesize,
+          pagenum: this.currentPage
+        }
+      }).then(res => {
+        console.log(res)
+        this.securityNotices = res.data.data.result
+        this.total = res.data.data.totalrecords
+        // this.reload()
+      }).catch((error) => {
+        console.log(error)// 异常
+      })
+    },
+    handleDelete (index, row) {
+      request({
+        method: 'get',
+        url: '/bulletin/deletesafetycolumn',
+        params: {
+          id: row.id
+        }
+      }).then((res) => {
+        this.reload()
+      }).catch((error) => {
+        console.log(error)// 异常
+      })
+    },
+    handleCurrentChange (val) {
+      console.log('val' + val)
+      this.currentPage = val
+      if (this.range[0] !== '' && this.range[1] !== '') {
+        this.getSecurityNotices(this.range[0], this.range[1])
+      } else {
+        this.getSecurityNotices('1970-01-01', '2100-12-31')
+      }
     }
   }
 }
 </script>
 
 <style scoped>
-
+  >>>.el-pagination__total, >>>.el-pagination__jump{
+    color: white;
+  }
+  >>> .el-pagination span {
+    font-size: 18px;
+  }
+  >>>.number{
+    color: #dddddd;
+  }
 </style>

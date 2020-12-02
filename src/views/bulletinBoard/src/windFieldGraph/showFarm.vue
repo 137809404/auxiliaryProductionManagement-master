@@ -1,31 +1,31 @@
 <template>
   <div>
-<!--    <div class="sub-title">-->
-<!--      {{farmName}}一次系统图-->
-<!--    </div>-->
     <el-row type="flex" :gutter="20" style="padding-left: 20px; padding-top: 10px; margin-bottom: 9px">
-      <el-col :span="1">
-        <el-button type="text" @click="goback"><i class="el-icon-back" style="color: white;font-size: xx-large"></i></el-button>
-      </el-col>
-      <el-col :span="4">
-        <h2 style="margin-top: 12px;margin-left: -25px">{{farmName}}一次系统图</h2>
+      <el-button type="text" @click="goback"><i class="el-icon-back subtitle"></i></el-button>
+      <h2 class="subtitle" style="margin-top: 20px; margin-left: 5px">{{this.farmName}}一次系统图</h2>
+      <el-col :span="16"></el-col>
+      <el-col :span="2">
+        <div style="padding: 20px 0px 15px 0px">
+          <el-button class="el-blue-button" @click="handleEdit()"><i class="el-icon-document"></i>修改</el-button>
+        </div>
       </el-col>
     </el-row>
-    <el-row :gutter="22">
-      <el-col :span="20">
+    <hr style="border-bottom: none;border-color: #8c939d"/>
+    <el-row :gutter="20" style="margin-top: 5vh">
+      <el-col :span="18" :offset="5">
         <el-image
-          style="width: 1000px; height: 900px"
+          style="width:90vh; height: 65vh;margin-bottom: 30px"
           :src="imgUrl"
-          fit="contain"></el-image>
-      </el-col>
-      <el-col :span="2">
-        <el-button class="el-blue-button" size="mini" @click="handleEdit()">编辑</el-button>
+          fit="fill"></el-image>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
+import request from '@/network/request'
+import { baseURL } from '@/config/baseConfig'
+
 export default {
   name: 'showFarm',
   data () {
@@ -38,19 +38,24 @@ export default {
   created () {
     this.farmId = this.$route.query.data
     var that = this
-    this.$axios.get('/bulletin/getshowcase?id=' + this.farmId).then(res => {
+    request({
+      method: 'get',
+      url: '/bulletin/getshowcase',
+      params: {
+        id: this.farmId
+      }
+    }).then(res => {
       // console.log(res)
       that.farmName = res.data.data.name
-      that.imgUrl = 'http://202.199.6.45:8080/' + res.data.data.imgurl
-      // eslint-disable-next-line handle-callback-err
-    }, error => {
-      console.log(error)
+      that.imgUrl = baseURL + '/' + res.data.data.imgurl
+    }).catch((error) => {
+      console.log(error)// 异常
     })
   },
   methods: {
     handleEdit () {
-      console.log(this.farmName)
-      this.goViewWithQuery('编辑风电场系统图', this.farmName)
+      console.log(this.farmId)
+      this.goViewWithQuery('编辑风电场系统图', this.farmId)
     },
     goview (name) {
       this.$router.push({ name }).catch(err => {

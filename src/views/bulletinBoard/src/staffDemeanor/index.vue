@@ -1,149 +1,43 @@
 <template>
   <div>
-    <div class="sub-title">员工风采</div>
-    <div v-show="this.interfaceNow==='home'">
-      <div>
-        <div>
-          <el-row  :gutter="20">
-            <el-col :span="20">
-              <el-form :inline="true" class="demo-form-inline">
-                <el-form-item >
-                  <div class="block">
-                    <el-input v-model="input" placeholder="请输入内容"><el-button class="el-blue-button" @click="searchItem()" slot="append" icon="el-icon-search"></el-button></el-input>
-                  </div>
-                </el-form-item>
-                <el-button class="el-blue-button" @click="interfaceNow='new';resetForm()"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
-
-              </el-form>
-            </el-col>
-          </el-row>
-        </div>
-      </div>
-      <div style="width: 90%;margin: 10px auto;">
+    <el-row type="flex" :gutter="20" style="padding-left: 20px">
+      <el-col :span="2">
+        <h2 class="subtitle" style="margin-top: 23px; margin-left: 5px">员工风采</h2>
+      </el-col>
+      <el-col :span="22">
+        <el-form :inline="true"  class="demo-form-inline" style="margin-left: 50px; margin-top: 20px">
+          <el-form-item>
+            <el-input prefix-icon="el-icon-search" placeholder="请输入关键字" v-model="input"> </el-input>
+          </el-form-item>
+          <el-button class="el-blue-button" @click="searchItem()"><i class="el-icon-search"></i> &nbsp;查询</el-button>
+          <el-button class="el-blue-button" style="float: right;margin-right: 33px" @click="goview('新增风采')"><i class="el-icon-plus"></i>&nbsp;新增</el-button>
+        </el-form>
+      </el-col>
+    </el-row>
+    <hr style="border-bottom: none;border-color: #8c939d"/>
+    <div>
+      <div style="width: 95%;margin: 10px auto;">
         <el-card v-for="item in staffDemeanorList" :key="item.id" class="box-card">
           <div class="staffCard" >
-            <div class="miniPic"><el-image v-show="item.src!=''" :src="baseUrl+'/'+item.src"></el-image></div>
-            <div class="briefText"><div>标题:{{item.title}}</div><span>{{item.content}}</span></div>
+            <div class="item-left">
+              <div class="miniPic"><el-image :src="baseUrl+'/'+item.src">{{item.url}}</el-image></div>
+<!--              <div class="miniPic"><el-image :src="imgsrc"></el-image></div>-->
+            <div class="briefText"><div style="margin: 7px 0px;font-size: 18px">{{item.title}}</div><span>{{item.content}}</span></div>
+            </div>
             <div class="operation">
-              <el-button class="el-blue-button" type="primary" icon="el-icon-search" @click="chakan(item)"></el-button>
-              <el-button class="el-blue-button" type="primary" icon="el-icon-edit" @click="edit(item)"></el-button>
-              <el-popconfirm
-                title="这是一段内容确定删除吗？" style="margin-left: 10px"
-                @onConfirm="deleteStaffCard(item.id)"
-              >
-                <el-button  slot="reference" class="el-blue-button" type="primary" icon="el-icon-delete"></el-button>
-              </el-popconfirm>
-
+              <el-button class="el-green-button" type="primary"  @click="goViewWithQuery('查看风采',item.id)">查看</el-button>
+              <el-button class="el-blue-button" type="primary" @click="goViewWithQuery('修改风采',item)">修改</el-button>
+              <el-button  class="el-red-button" type="primary" @click="deleteStaffCard(item.id)">删除</el-button>
             </div>
           </div>
         </el-card>
-      </div>
-    </div>
-    <div v-show="this.interfaceNow==='edit'">
-      <div>
-        <el-button class="el-blue-button" @click="turnBack('home')">返回上级</el-button>
-      </div>
-      <div class="content-div">
-        <el-form :label-position="'right'" label-width="80px" :model="formLabelAlign">
-          <el-form-item label-width="0px">
-          <el-col :span="15">
-            <el-form-item label="标题" required>
-              <el-input v-model="formLabelAlign.title"></el-input>
-            </el-form-item>
-          </el-col>
-          <el-col class="line" :span="2"></el-col>
-          <el-col :span="8">
-            <el-form-item label="时间" required>
-              <el-date-picker type="date" placeholder="选择日期" v-model="formLabelAlign.timestamp" style="width: 100%;"></el-date-picker>
-            </el-form-item>
-          </el-col>
-          </el-form-item>
-          <el-form-item label="内容" required>
-            <el-input type="textarea" v-model="formLabelAlign.content"></el-input>
-          </el-form-item>
-          <el-form-item label="附件">
-            <el-upload
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :on-change="handleChange"
-              :file-list="fileList"
-              :auto-upload="false"
-              list-type="picture-card">
-              <i class="el-icon-plus"></i>
-            </el-upload>
-          </el-form-item>
-          <el-form-item>
-            <el-button class="el-blue-button" type="primary" @click="submitChange(formLabelAlign)">提交</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-    </div>
-    <div v-show="this.interfaceNow==='new'">
-      <div>
-        <el-button class="el-blue-button" @click="turnBack('home')">返回上级</el-button>
-      </div>
-      <div class="content-div">
-        <el-form :label-position="'right'" label-width="80px" :model="formLabelAlign">
-          <el-form-item label-width="0px">
-            <el-col :span="15">
-              <el-form-item label="标题" required>
-                <el-input v-model="formLabelAlign.title"></el-input>
-              </el-form-item>
-            </el-col>
-            <el-col class="line" :span="2"></el-col>
-            <el-col :span="8">
-              <el-form-item label="时间" required>
-                <el-date-picker type="date" placeholder="选择日期" v-model="formLabelAlign.timestamp" style="width: 100%;"></el-date-picker>
-              </el-form-item>
-            </el-col>
-          </el-form-item>
-          <el-form-item label="内容" required>
-            <el-input type="textarea" v-model="formLabelAlign.content"></el-input>
-          </el-form-item>
-          <el-form-item label="附件">
-            <el-upload
-              class="upload-demo"
-              action="https://jsonplaceholder.typicode.com/posts/"
-              :on-preview="handlePreview"
-              :on-change="handleChange"
-              :file-list="fileList"
-              :auto-upload="false"
-              list-type="picture">
-              <el-button size="small" type="primary">点击上传</el-button>
-              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-            </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" alt="">
-            </el-dialog>
-          </el-form-item>
-          <el-form-item>
-            <el-button class="el-blue-button" type="primary" @click="submitNew(formLabelAlign)">提交</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-    </div>
-    <el-dialog :visible.sync="dialogVisible">
-      <el-image :src="dialogImageUrl"></el-image>
-    </el-dialog>
-    <div v-show="this.interfaceNow==='chakan'">
-      <div>
-        <el-button class="el-blue-button" @click="turnBack('home')">返回上级</el-button>
-      </div>
-      <div class="content-div">
-        <div class="topicDiv">
-          标题：{{chakanItem.title}}
-        </div>
-        <div class="dateDiv">
-          时间：{{chakanItem.date.slice(0,4)}}年{{chakanItem.date.slice(5,7)}}月{{chakanItem.date.slice(8,10)}}日
-        </div>
-        <div class="textDiv">
-          <div>内容：</div>
-          {{chakanItem.content}}
-        </div>
-        <div class="imageDiv">
-          <el-image v-for="item in chakanItem.fileList" :key="item.id" class="activityImage" :src="item.url"></el-image>
-        </div>
+        <el-pagination
+          style="margin-top: 10px;float: right"
+          @current-change="handleCurrentChange"
+          :page-size="pageSize"
+          layout="total, prev, pager, next, jumper"
+          :total="totalrecords">
+        </el-pagination>
       </div>
     </div>
   </div>
@@ -157,51 +51,31 @@ export default {
   name: 'index',
   data () {
     return {
+      pageSize: Math.floor((window.innerHeight - 190) / 160),
+      totalrecords: 0,
       baseUrl: baseURL,
       input: '',
-      interfaceNow: 'home',
-      editID: 0,
       staffDemeanorList: [
       ],
-      formLabelAlign: {
-        id: -1,
-        title: '',
-        timestamp: '',
-        content: ''
-      },
-      dialogImageUrl: '',
-      dialogVisible: false,
-      disabled: false,
-      fileList: [],
-      chakanItem: {
-        title: '',
-        date: '',
-        content: '',
-        fileList: []
-      },
-      deleteFiles: []
+      disabled: false
     }
   },
   created () {
-    this.getAllDemeanor()
-    console.log(baseURL)
+    this.pageSize = Math.floor((window.innerHeight - 190) / 160)
+    this.getAllDemeanor(1)
   },
   methods: {
     searchItem () {
       this.staffDemeanorList = []
       request({
-        url: '/bulletin/showstaffmoment'
+        url: `/bulletin/searchstaffmoment?keyword=${this.input}`
       }).then(res => {
-        for (var i = 0, len = res.data.data.length; i < len; i++) {
-          if (res.data.data[i].title.indexOf(this.input) !== -1) {
-            this.staffDemeanorList.push(res.data.data[i])
-          }
-        }
-        for (var j = 0, len1 = this.staffDemeanorList.length; j < len1; j++) {
-          if (this.staffDemeanorList[j].imgs.length !== 0) {
-            this.staffDemeanorList[j].src = this.staffDemeanorList[j].imgs[0].imgurl
+        this.staffDemeanorList = res.data.data
+        for (var i = 0, len = this.staffDemeanorList.length; i < len; i++) {
+          if (this.staffDemeanorList[i].imgs.length !== 0) {
+            this.staffDemeanorList[i].src = this.staffDemeanorList[i].imgs[0].imgurl
           } else {
-            this.staffDemeanorList[j].src = ''
+            this.staffDemeanorList[i].src = ''
           }
         }
         // eslint-disable-next-line handle-callback-err
@@ -219,11 +93,12 @@ export default {
       this.fileList = []
       this.deleteFiles = []
     },
-    getAllDemeanor () {
+    getAllDemeanor (pagenum) {
       request({
-        url: '/bulletin/showstaffmoment'
+        url: `/bulletin/showstaffmoment?pagenum=${pagenum}&pagesize=${this.pageSize}`
       }).then(res => {
-        this.staffDemeanorList = res.data.data
+        this.staffDemeanorList = res.data.data.data.result
+        this.totalrecords = res.data.data.data.totalrecords
         for (var i = 0, len = this.staffDemeanorList.length; i < len; i++) {
           if (this.staffDemeanorList[i].imgs.length !== 0) {
             this.staffDemeanorList[i].src = this.staffDemeanorList[i].imgs[0].imgurl
@@ -235,8 +110,10 @@ export default {
       }, error => {
         console.log('error')
       })
+      console.log(this.staffDemeanorList)
     },
     deleteStaffCard (id) {
+      console.log(id)
       request({
         method: 'post',
         url: `/bulletin/deletestaffmoment?id=${id}`
@@ -256,143 +133,6 @@ export default {
       this.resetForm()
       this.getAllDemeanor()
     },
-    edit (item) {
-      this.fileList = []
-      for (var i = 0, len = item.imgs.length; i < len; i++) {
-        this.fileList.push({
-          name: item.imgs[i].name,
-          url: this.baseUrl + '/' + item.imgs[i].imgurl
-        })
-      }
-      this.formLabelAlign = {
-        id: item.id,
-        title: item.title,
-        timestamp: item.timestamp,
-        content: item.content,
-        files: this.fileList
-      }
-      this.interfaceNow = 'edit'
-      this.editID = item.id
-      this.goViewWithQuery('编辑风采', this.formLabelAlign)
-    },
-    submitChange (form) {
-      request({
-        method: 'post',
-        url: `/bulletin/editstaffmoment?id=${form.id}&timestamp=${this.formatDate(new Date(form.timestamp), 'yyyy-MM-dd hh:mm:ss')}&content=${form.content}&title=${form.title}`
-      }).then(res => {
-        console.log(this.deleteFiles)
-        // for (var i = 0, len = this.deleteFiles.length; i < len; i++) {
-        //   filenames.push(this.deleteFiles[i].name)
-        // }
-        request({
-          method: 'post',
-          url: `/bulletin/deletestaffmomentpic?id=${form.id}&filename=${this.deleteFiles}`
-        }).then(res => {
-          // eslint-disable-next-line handle-callback-err
-        }, error => {
-          this.$message.error('修改失败')
-        })
-        const fd = new FormData()
-        fd.append('id', form.id)
-        for (var j = 0, len1 = this.fileList.length; j < len1; j++) {
-          fd.append('files', this.fileList[j].raw)
-        }
-        request({
-          method: 'post',
-          url: '/bulletin/uploadstaffmomentpic',
-          data: fd
-        }).then(res => {
-          // eslint-disable-next-line handle-callback-err
-        }, error => {
-          this.$message.error('修改失败')
-        })
-        this.$message.success('修改成功')
-        this.getAllDemeanor()
-        this.interfaceNow = 'home'
-        this.resetForm()
-        // eslint-disable-next-line handle-callback-err
-      }, error => {
-        this.$message.error('修改失败')
-      })
-    },
-    handleRemove (file) {
-      console.log(file)
-      this.deleteFiles.push(file.name)
-      this.fileList.splice(this.fileList.indexOf(file), 1)
-    },
-    handleChange (file) {
-      this.fileList.push(file)
-      console.log(this.fileList)
-    },
-    handlePreview (file) {
-      this.dialogImageUrl = file.url
-      this.dialogVisible = true
-    },
-    chakan (item) {
-      this.chakanItem = {
-        title: '',
-        date: '',
-        content: '',
-        fileList: []
-      }
-      for (var i = 0, len = item.imgs.length; i < len; i++) {
-        this.chakanItem.fileList.push({
-          name: item.imgs[i].name,
-          url: this.baseUrl + '/' + item.imgs[i].imgurl
-        })
-      }
-      this.chakanItem.title = item.title
-      this.chakanItem.content = item.content
-      this.chakanItem.date = item.timestamp.slice(0, 10)
-      this.interfaceNow = 'chakan'
-    },
-    submitNew (form) {
-      const fd = new FormData()
-      fd.append('title', form.title)
-      fd.append('content', form.content)
-      fd.append('timestamp', this.formatDate(new Date(form.timestamp), 'yyyy-MM-dd hh:mm:ss'))
-      for (var i = 0, len = this.fileList.length; i < len; i++) {
-        fd.append('files', this.fileList[i].raw)
-      }
-      request({
-        method: 'post',
-        url: '/bulletin/addstaffmoment',
-        data: fd
-      }).then(res => {
-        this.getAllDemeanor()
-        this.$message({
-          message: '新建成功！',
-          type: 'success'
-        })
-        this.resetForm()
-        this.interfaceNow = 'home'
-        // eslint-disable-next-line handle-callback-err
-      }, error => {
-        this.$message.error('新建失败')
-      })
-    },
-    formatDate (date, fmt) {
-      if (/(y+)/.test(fmt)) {
-        fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
-      }
-      const o = {
-        'M+': date.getMonth() + 1,
-        'd+': date.getDate(),
-        'h+': date.getHours(),
-        'm+': date.getMinutes(),
-        's+': date.getSeconds()
-      }
-      for (const k in o) {
-        if (new RegExp(`(${k})`).test(fmt)) {
-          const str = o[k] + ''
-          fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str))
-        }
-      }
-      return fmt
-    },
-    padLeftZero (str) {
-      return ('00' + str).substr(str.length)
-    },
     goview (name) {
       this.$router.push({ name }).catch(err => {
         err && console.log('刷新') // 待优化
@@ -402,23 +142,41 @@ export default {
       this.$router.push({ name, query: { data: data } }).catch(err => {
         err && console.log('刷新') // 待优化
       })
+    },
+    handleCurrentChange (val) {
+      this.getAllDemeanor(val)
     }
   }
 }
 </script>
 
 <style scoped>
+  .el-card{
+    border: 0px;
+  }
   .miniPic {
+    display: inline-block;
     width: 150px;
+    margin-right: 8px;
+  }
+  .box-card{
+    margin: 10px 0;
+    width: 100%;
+    height: 100%;
   }
   .staffCard {
+    height: 120px;
     display: flex;
-    min-height: 120px;
-    align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
   }
   .briefText {
-    width: 600px;
+    display: inline-block;
+    margin: 8px;
+    height: 100%;
+    width: 80%;
+  }
+  .el-image{
+    border-radius: 5px ;
   }
   .el-image /deep/ img {
     margin: 0px;
@@ -441,33 +199,44 @@ export default {
     text-align: right;
     font-size: 28px;
   }
+  .item-left{
+    display: flex;
+    align-items:center;
+    width: 75%;
+  }
+  .item-left span{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    color: #d9d9d9;
+  -webkit-box-orient: vertical;
+  }
   .imageDiv{
     padding: 10px;
     width: 100%;
   }
-  .activityImage{
+  .operation{
+    display: inline-block;
+    float: right;
+    line-height: 120px;
+  }
+  .operation .el-button{
     width: 30%;
-    margin: 5px;
   }
-  .el-form-item /deep/ textarea {
-    background-color: transparent;
-  }
-  .el-form /deep/ label {
+  >>>.el-pagination__total, >>>.el-pagination__jump{
     color: white;
   }
-  .el-form /deep/ .el-input__inner {
-    color: white;
+  >>> .el-pagination span {
+    font-size: 18px;
   }
-  .el-form /deep/ .el-textarea__inner {
-    color: white;
+  >>>.number{
+    color: #dddddd;
   }
-  .el-form /deep/ div {
+  >>>.el-card__body {
+    background-color: rgb(48,53,78);
     color: white;
-  }
-  .el-form /deep/ .el-upload-list__item-name {
-    color: white;
-  }
-  .el-form /deep/ .el-upload--picture-card {
-    background-color: transparent;
+    border-color: rgb(48,53,78);
+    border-radius: 0px;
   }
 </style>
